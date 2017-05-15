@@ -5,12 +5,11 @@ from instance.config import app_config
 from app.models import User, BucketList, BucketListItems
 
 
-
 class BucketlistTestCase(unittest.TestCase):
     """This class represents the bucketlist test cases"""
 
     def setUp(self):
-        self.app = app_config('testing')
+        self.app = app_config['testing']
         #gets the current state
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -25,10 +24,24 @@ class BucketlistTestCase(unittest.TestCase):
             'created_by': 1
         }
 
-        self.new_item = {
+        self.new_bucketlist_item = {
             'item_id': 1,
             'item_name': 'Download tutorials',
             'date_created': '2017-05-14 16:45:17',
             'date_modified': '2017-06-1 18:04:10',
             'status': 'False'
         }
+# def tearDown(self):
+#     db.session.remove()
+#     db.drop_all()
+#     self.app_context.pop()
+
+    def test_create_bucketlist_successfully(self):
+        """Test API can create a bucketlist successfully"""
+        response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist))
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_bucketlist_item_successfully(self):
+        """Test API can create a bucketlist item successfully"""
+        response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist_item))
+        self.assertEqual(response.status_code, 201)
