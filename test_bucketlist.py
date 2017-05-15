@@ -55,3 +55,27 @@ class BucketlistTestCase(unittest.TestCase):
         """Test API can create a bucketlist item successfully"""
         response = self.client.post('/bucketlists/id/items',data=json.dumps(self.new_bucketlist_item))
         self.assertEqual(response.status_code, 201)
+
+    def test_cannot_create_bucketlist_if_unauthorized(self):
+        """Test cannot create bucketlist if unauthorized"""
+        #add unauthorized user
+        response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist))
+        self.assertEqual(response.status_code, 403)
+
+    def test_cannot_list_all_bucketlists_if_unauthorized(self):
+        """Test API cannot list all bucketlists if unauthorized"""
+        #add unauthorized user
+        response = self.client.get('/bucketlists/',data=json.loads(self.new_bucketlist))
+        self.assertEqual(response.status_code, 403)
+
+    def test_api_can_cannot_get_bucketlist_by_id_if_unauthorized(self):
+        """Test API cannot get bucketlist by id if unauthorized"""
+        #add unauthorized user
+        response = self.client.get('/bucketlists/1', data=json.loads(self.new_bucketlist))
+        self.assertEqual(response.status_code, 403)
+
+    def test_cannot_create_bucketlist_item_if_unauthorized(self):
+        """Test API cannot create a bucketlist item if unauthorized"""
+        #add unauthorized user
+        response = self.client.post('/bucketlists/id/items',data=json.dumps(self.new_bucketlist_item))
+        self.assertEqual(response.status_code, 403)
