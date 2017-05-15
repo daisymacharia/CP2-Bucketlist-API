@@ -31,17 +31,27 @@ class BucketlistTestCase(unittest.TestCase):
             'date_modified': '2017-06-1 18:04:10',
             'status': 'False'
         }
-# def tearDown(self):
-#     db.session.remove()
-#     db.drop_all()
-#     self.app_context.pop()
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
 
     def test_create_bucketlist_successfully(self):
         """Test API can create a bucketlist successfully"""
         response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist))
         self.assertEqual(response.status_code, 201)
 
+    def test_list_all_bucketlists(self):
+        """Test API can get list all bucketlists"""
+        response = self.client.get('/bucketlists/',data=json.loads(self.new_bucketlist))
+        self.assertEqual(response.status_code, 200)
+
+    def test_api_can_get_bucketlist_by_id(self):
+        """Test API can get bucketlist by id"""
+        response = self.client.get('/bucketlists/1', data=json.loads(self.new_bucketlist))
+        self.assertEqual(response.status_code, 200)
+
     def test_create_bucketlist_item_successfully(self):
         """Test API can create a bucketlist item successfully"""
-        response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist_item))
+        response = self.client.post('/bucketlists/id/items',data=json.dumps(self.new_bucketlist_item))
         self.assertEqual(response.status_code, 201)
