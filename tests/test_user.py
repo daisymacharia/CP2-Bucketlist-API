@@ -20,20 +20,20 @@ class UserTests(BaseTest):
     def test_login_with_invalid_email(self):
         """Asserts that a user cannot login with invalid email"""
         response = self.client.post('/auth/login', data=json.dumps(self.login_with_no_username))
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 401)
     def test_login_with_invalid_password(self):
         """Asserts user cannot login with invalid password"""
         response = self.client.post('/auth/login', data=json.dumps(self.login_with_no_password))
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 401)
     def test_login_with_no_credentials(self):
         """Asserts user cannot login with no credentials"""
         response = self.client.post('/auth/login', data=json.dumps(self.login_no_credentials))
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 401)
     def test_cannot_register_existing_user(self):
         """Asserts that an already existing user cannot register again"""
         self.client.post('/auth/register',data=json.dumps(self.user))
         register_user = self.client.post('/auth/register',data=json.dumps(self.user))
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 409)
     def tearDown(self):
         db.session.remove()
         db.drop_all()
