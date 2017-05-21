@@ -2,12 +2,9 @@ from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
-from app.bucketlistapi.resources import (UserRegister,
-                               UserLogin,
-                               Bucketlists,
-                               BucketlistsId,
-                               BucketlistItem,
-                               BucketlistItems)
+#from app import *
+# from bucketlistapi.resources import *
+from app.bucketlistapi.resources import *
 
 db = SQLAlchemy()
 
