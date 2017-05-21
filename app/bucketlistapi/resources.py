@@ -25,31 +25,6 @@ class UserRegister(Resource):
         verify_password = data['verify_password']
         if password != verify_password:
             return 'Passwords dont match'
-        return 'Nice'
-        # email = data['email']
-        # email = User.query.filter_by(email=email).first()
-        # if email:
-        #     response = {'error': 'Email already in use'}
-        #     return response, 400
-        # try:
-        #     #register user
-        #     new_user = User(first_name,last_name,email,password)
-        #     # new_user.first_name = first_name
-        #     # new_user.last_name = last_name
-        #     # username= first_name + last_name
-        #     # new_user.email = email
-        #     # new_user.password = password
-        #     db.session.add(new_user)
-        #     db.session.commit()
-        #     return {'message': '{} added successfully'.format(username)}, 201
-        # except Exception as error:
-        #     db.session.rollback()
-        #     return {'error': '{} try again'.format(username)}, 400
-
-
-
-
-
 
 class UserLogin(Resource):
     """Login user"""
