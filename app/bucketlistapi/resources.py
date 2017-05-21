@@ -8,7 +8,7 @@ currentdir = os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
-from models import BucketListItems,BucketList,User
+from models import User
 from schema import (UserRegistrationSchema,
                                     UserLoginSchema,
                                     BucketListItemSchema,
@@ -29,11 +29,18 @@ class UserRegister(Resource):
         errors = user_register.validate(data)
         if errors:
             return errors, 400
-        
         password = data['password']
         verify_password = data['verify_password']
         if password != verify_password:
             return 'Passwords dont match'
+        first_name = data['first_name']
+        last_name = data['last_name']
+        email = data['email']
+        password = data['password']
+        verify_password = data['verify_password']
+        new_user =User(first_name=first_name,last_name=last_name,email=email,password=password)
+        new_user.add(new_user)
+        return 'Success'
 
 
 class UserLogin(Resource):
