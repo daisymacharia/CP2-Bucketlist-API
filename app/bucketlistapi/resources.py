@@ -41,8 +41,8 @@ class UserRegister(Resource):
         # # if email:
         # #     response = {'error': 'Email already in use'}
         # #     return response, 400
-        new_user = User(first_name=first_name,last_name=last_name,email=email,password=password)
-        new_user.set_password(password)
+        new_user = User(first_name=first_name,last_name=last_name,email=email, password=password)
+        new_user.hash_password(password)
         new_user.add(new_user)
         username = first_name + ' ' + last_name
         return {'message': '{} added successfully'.format(username)}, 201
@@ -50,12 +50,27 @@ class UserRegister(Resource):
 
 class UserLogin(Resource):
     """Login user"""
-    pass
+    def post(self):
+        login_data = request.get_json()
+        errors = user_login.validate(login_data)
+        if errors:
+            return errors, 400
+        email = login_data['email']
+        password = login_data['password']
+        if email:
+            email = User.query.filter_by(email=email).first()
+            if not email:
+                response = {'error': 'Email provided does not exist'}
+            if user.verify_user_password(password):
+                token = user.generate_auth_token()
+                return 'Login successful'
+
 
 
 class Bucketlists(Resource):
     """Create and list bucketlists"""
     pass
+
 
 
 class BucketlistsId(Resource):

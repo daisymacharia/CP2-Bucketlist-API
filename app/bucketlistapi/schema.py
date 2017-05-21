@@ -15,7 +15,7 @@ class UserRegistrationSchema(Schema):
 
 class UserLoginSchema(Schema):
     """Schema class to validate user during login"""
-    email = fields.Email(required = True, load_only=True, validate=[validate.Length(max=12)],error_messages = {'required': 'Email required'})
+    email = fields.Email(required = True, load_only=True, validate=[validate.Length(min=12)],error_messages = {'required': 'Email required'})
     password = fields.String(required = True, load_only=True, validate=[validate.Length(min=6)],error_messages = {'required':'Password required'})
 
 class BucketListItemSchema(Schema):

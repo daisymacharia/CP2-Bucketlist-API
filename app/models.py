@@ -6,7 +6,10 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from app.__init__ import db
-from werkzeug.security import generate_password_hash,check_password_hash
+
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 class AddUpdateDelete():
     def add(self, resource):
@@ -38,12 +41,29 @@ class User(db.Model, AddUpdateDelete):
         self.last_name = last_name
         self.email = email
         self.password = password
+
     #hash password
-    def set_password(self, password):
-        self.pw_hash = generate_password_hash(password)
-    #check password during login
-    def check_password(self, password):
-        return check_password_hash(self.pw_hash, password)
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+    #verify password
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
+    def generate_auth_token(self, expiration = 300):
+        s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
+        return s.dumps({ 'id': self.id })
+    def verify_auth_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None # valid token, but expired
+        except BadSignature:
+            return None # invalid token
+        user = User.query.get(data['id'])
+        return user
+
+
 class BucketList(db.Model, AddUpdateDelete):
     """Defines the bucketlist model"""
     __tablename__ = "bucketlist"
