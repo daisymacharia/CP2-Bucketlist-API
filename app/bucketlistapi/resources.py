@@ -41,7 +41,8 @@ class UserRegister(Resource):
         # # if email:
         # #     response = {'error': 'Email already in use'}
         # #     return response, 400
-        new_user =User(first_name=first_name,last_name=last_name,email=email,password=password)
+        new_user = User(first_name=first_name,last_name=last_name,email=email,password=password)
+        new_user.set_password(password)
         new_user.add(new_user)
         username = first_name + ' ' + last_name
         return {'message': '{} added successfully'.format(username)}, 201
