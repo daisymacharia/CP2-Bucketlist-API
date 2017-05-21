@@ -31,31 +31,3 @@ class BucketListSchema(Schema):
     created_by = fields.Integer(attribute='user.user_id', dump_only=True)
     date_created = fields.DateTime(dump_only=True)
     date_modified = fields.DateTime(dump_only=True)
-email = data['email']
-email = User.query.filter_by(email=email).first()
-if email:
-    response = {'error': 'Email already in use'}
-    return response, 400
-        # try:
-        #     first_name = data['first_name']
-        #     last_name = data['last_name']
-        #     email = data['email']
-        #     password = data['password']
-        #     verify_password = data['verify_password']
-        #     new_user =User(first_name,last_name,email,password,verify_password)
-        #     db.add(new_user)
-
-        # try:
-        #     #register user
-        #     new_user = User(first_name,last_name,email,password)
-        #     # new_user.first_name = first_name
-        #     # new_user.last_name = last_name
-        #     # username= first_name + last_name
-        #     # new_user.email = email
-        #     # new_user.password = password
-        #     db.session.add(new_user)
-        #     db.session.commit()
-        #     return {'message': '{} added successfully'.format(username)}, 201
-        # except Exception as error:
-        #     db.session.rollback()
-        #     return {'error': '{} try again'.format(username)}, 400
