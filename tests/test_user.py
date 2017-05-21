@@ -9,9 +9,24 @@ from app.models import User, BucketList, BucketListItems
 
 class UserTests(BaseTest):
     """Creates class for testing user edge cases"""
+    def setUp(self):
+        self.app = create_app('testing')
+        #gets the current state
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+        self.client = self.app.test_client()
+
+        self.user = {
+            "first_name":"felistas",
+             "last_name":"ngumi",
+             "email":"felistaswaceerangumiiif@gmail.com",
+             "password":"waceera",
+             "verify_password":"waceera"
+        }
     def test_create_user_successfully(self):
         """Asserts that a user can be created successfully"""
-        response = self.client.post('/auth/register',data=json.dumps(self.user))
+        response = self.client.post('/api/v1/auth/register',data=json.dumps(self.user))
         self.assertEquals(response.status_code, 200)
     def test_login_successful(self):
         """Asserts a user can login successfully"""

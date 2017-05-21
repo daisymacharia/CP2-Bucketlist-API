@@ -6,6 +6,7 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from app.__init__ import db
+from werkzeug.security import generate_password_hash,check_password_hash
 
 class AddUpdateDelete():
     def add(self, resource):
@@ -26,7 +27,7 @@ class User(db.Model, AddUpdateDelete):
     user_id = db.Column(db.Integer, autoincrement=True,primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name= db.Column(db.String(50), nullable=False)
-    email= db.Column(db.String(50), unique=True,nullable=False)
+    email= db.Column(db.String(50), unique=True, nullable=False)
     password= db.Column(db.String(30), nullable=False)
 
     def __repr__(self):
@@ -37,8 +38,12 @@ class User(db.Model, AddUpdateDelete):
         self.last_name = last_name
         self.email = email
         self.password = password
-
-
+    #hash password
+    def set_password(self, password):
+        self.pw_hash = generate_password_hash(password)
+    #check password during login
+    def check_password(self, password):
+        return check_password_hash(self.pw_hash, password)
 class BucketList(db.Model, AddUpdateDelete):
     """Defines the bucketlist model"""
     __tablename__ = "bucketlist"

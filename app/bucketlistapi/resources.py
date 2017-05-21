@@ -29,18 +29,22 @@ class UserRegister(Resource):
         errors = user_register.validate(data)
         if errors:
             return errors, 400
-        password = data['password']
-        verify_password = data['verify_password']
-        if password != verify_password:
-            return 'Passwords dont match'
         first_name = data['first_name']
         last_name = data['last_name']
         email = data['email']
         password = data['password']
         verify_password = data['verify_password']
+        if password != verify_password:
+            response = {'error': 'Passwords dont match'}
+            return response, 400
+        # email = User.query.filter_by(email=email).first()
+        # # if email:
+        # #     response = {'error': 'Email already in use'}
+        # #     return response, 400
         new_user =User(first_name=first_name,last_name=last_name,email=email,password=password)
         new_user.add(new_user)
-        return 'Success'
+        username = first_name + ' ' + last_name
+        return {'message': '{} added successfully'.format(username)}, 201
 
 
 class UserLogin(Resource):
