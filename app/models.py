@@ -12,6 +12,11 @@ class User(db.Model):
     def __repr__(self):
         """returning a printable version for the object"""
         return "<UserModel: {}>".format(self.first_name)
+    def __init__(self, first_name, last_name, email, password):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.password = password
 
 class BucketList(db.Model):
     """Defines the bucketlist model"""
@@ -23,6 +28,8 @@ class BucketList(db.Model):
                             cascade='all, delete-orphan', lazy='dynamic')
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
+
+
 
 
 class BucketListItems(db.Model):
