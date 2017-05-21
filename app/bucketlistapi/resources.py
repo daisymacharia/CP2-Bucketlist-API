@@ -29,6 +29,7 @@ class UserRegister(Resource):
         errors = user_register.validate(data)
         if errors:
             return errors, 400
+        
         password = data['password']
         verify_password = data['verify_password']
         if password != verify_password:
