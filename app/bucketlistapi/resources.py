@@ -37,13 +37,13 @@ class UserRegister(Resource):
         if password != verify_password:
             response = {'error': 'Passwords dont match'}
             return response, 400
-        # email = User.query.filter_by(email=email).first()
-        # # if email:
-        # #     response = {'error': 'Email already in use'}
-        # #     return response, 400
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            response = {'error': 'Email already in use'}
+            return response, 400
         new_user = User(first_name=first_name,last_name=last_name,email=email, password=password)
-        new_user.hash_password(password)
         new_user.add(new_user)
+        new_user.hash_password(password)
         username = first_name + ' ' + last_name
         return {'message': '{} added successfully'.format(username)}, 201
 
@@ -64,8 +64,6 @@ class UserLogin(Resource):
             if user.verify_user_password(password):
                 token = user.generate_auth_token()
                 return 'Login successful'
-
-
 
 class Bucketlists(Resource):
     """Create and list bucketlists"""

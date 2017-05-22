@@ -44,7 +44,8 @@ class User(db.Model, AddUpdateDelete):
 
     #hash password
     def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+        self.password = pwd_context.encrypt(password)
+        db.session.commit()
     #verify password
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)

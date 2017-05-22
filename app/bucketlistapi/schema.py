@@ -6,11 +6,11 @@ from marshmallow import Schema, fields,validate
 class UserRegistrationSchema(Schema):
 
     """Schema class to validate user during registration"""
-    first_name = fields.String(required = True, load_only=True,error_messages = {'required':'First name required'})
+    first_name = fields.String(required = True, load_only=True,validate=[validate.Length(min=3, max=12)],error_messages = {'required':'First name required'})
     last_name = fields.String(required = True, load_only=True, validate=[validate.Length(min=3, max=12)],error_messages ={'required': 'Last name required'})
     email = fields.Email(required = True, load_only=True, validate=[validate.Length(min=20)],error_messages = {'required': 'Email required'})
     password = fields.String(required = True, load_only=True, validate=[validate.Length(min=6)],error_messages = {'required': 'Password required'})
-    verify_password = fields.String(required = True, load_only=True, validate=[validate.Length(min=6, max=32)],error_messages = {'required': 'Password required'})
+    verify_password = fields.String(required = True, load_only=True, validate=[validate.Length(min=6)],error_messages = {'required': 'Password required'})
 
 
 class UserLoginSchema(Schema):
