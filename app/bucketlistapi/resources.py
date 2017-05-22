@@ -1,6 +1,4 @@
-
-from flask_restful import  Resource, abort
-from flask import request,jsonify
+import re
 import os
 import sys
 import inspect
@@ -8,6 +6,8 @@ currentdir = os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
+from flask_restful import  Resource, abort
+from flask import request,jsonify
 from models import User,BucketList,BucketListItems
 from schema import (UserRegistrationSchema,
                                     UserLoginSchema,
@@ -52,18 +52,20 @@ class UserLogin(Resource):
     """Login user"""
     def post(self):
         login_data = request.get_json()
+        if not login_data:
+            return 'No data provided'
         errors = user_login.validate(login_data)
         if errors:
             return errors, 400
         email = login_data['email']
         password = login_data['password']
-        if email:
-            email = User.query.filter_by(email=email).first()
-            if not email:
-                response = {'error': 'Email provided does not exist'}
-            if user.verify_user_password(password):
-                token = user.generate_auth_token()
-                return 'Login successful'
+        email = User.query.filter_by(email=email).first()
+        if not email:
+            response = {'error': 'Email provided does not exist'}
+            return response
+        if user.verify_user_password(password):
+            token = user.generate_auth_token()
+            return 'Login successful'
 
 class Bucketlists(Resource):
     """Create and list bucketlists"""
