@@ -53,8 +53,7 @@ class User(db.Model, AddUpdateDelete):
 
     def generate_auth_token(self, expiration = 600):
         s = Serializer(secret, expires_in = expiration)
-        s.dumps({ 'id': self.user_id })
-        return s
+        return s.dumps({ 'id': self.user_id })
 
     @staticmethod
     def verify_auth_token(token):
@@ -74,7 +73,7 @@ class BucketList(db.Model, AddUpdateDelete):
     __tablename__ = "bucketlist"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, autoincrement=True,primary_key=True)
-    created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable= False)
+    created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     name = db.Column(db.String(50), nullable=False)
     items = db.relationship("BucketListItems", backref="bucketlist",
                             cascade='all', lazy='joined')

@@ -80,7 +80,7 @@ class UserLogin(Resource):
         if email.verify_password(password):
             token = email.generate_auth_token()
             response = {'Message': 'Login successful','status': 200,
-                                'token': token.decode('ascii')}
+                                'token': token}
             return response
         else:
             response =jsonify({'Error': 'Wrong password', 'status':400})
