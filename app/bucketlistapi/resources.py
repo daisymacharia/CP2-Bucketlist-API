@@ -63,9 +63,11 @@ class UserLogin(Resource):
         if not email:
             response = {'error': 'Email provided does not exist'}
             return response
-        if user.verify_user_password(password):
-            token = user.generate_auth_token()
+        if email.verify_password(password):
+            token = email.generate_auth_token()
             return 'Login successful'
+        else:
+            response ={'error': 'Wrong password'}
 
 class Bucketlists(Resource):
     """Create and list bucketlists"""

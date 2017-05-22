@@ -10,6 +10,7 @@ from app.__init__ import db
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
+secret = os.getenv('SECRET')
 
 class AddUpdateDelete():
     def add(self, resource):
@@ -31,7 +32,7 @@ class User(db.Model, AddUpdateDelete):
     first_name = db.Column(db.String(50), nullable=False)
     last_name= db.Column(db.String(50), nullable=False)
     email= db.Column(db.String(50), unique=True, nullable=False)
-    password= db.Column(db.String(30), nullable=False)
+    password= db.Column(db.String(300), nullable=False)
 
     def __repr__(self):
         """returning a printable version for the object"""
@@ -48,13 +49,13 @@ class User(db.Model, AddUpdateDelete):
         db.session.commit()
     #verify password
     def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
+        return pwd_context.verify(password, self.password)
 
     def generate_auth_token(self, expiration = 300):
-        s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
-        return s.dumps({ 'id': self.id })
+        s = Serializer(secret, expires_in = expiration)
+        return s.dumps({ 'user_id': self.user_id })
     def verify_auth_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
+        s = Serializer(secret)
         try:
             data = s.loads(token)
         except SignatureExpired:
