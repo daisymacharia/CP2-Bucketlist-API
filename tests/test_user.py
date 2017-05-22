@@ -15,7 +15,7 @@ class UserTests(BaseTest):
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
-
+    def create_user(self):
         self.user = {
             "first_name":"felistas",
              "last_name":"ngumi",

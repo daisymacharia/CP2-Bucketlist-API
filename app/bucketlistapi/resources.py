@@ -72,8 +72,26 @@ class UserLogin(Resource):
             return response
 
 class Bucketlists(Resource):
-    """Create and list bucketlists"""
-    pass
+    """Creates a new bucketlist"""
+    def post(self):
+        bucketlist_data = request.get_json()
+        if not bucketlist_data:
+            response = jsonify({'Error': 'No data provided'})
+            return response
+        validation_errors = bucket_list.validate(bucketlist_data)
+        if validation_errors:
+            return validation_errors, 400
+        bucketlist_name = bucketlist_data['name']
+        existing_bucketlist = BucketList.query.filter_by(name=bucketlist_name).first()
+        if existing_bucketlist:
+            response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 400})
+        new_bucketlist_name = BucketList(name=bucketlist_name)
+        response = jsonify({'Message': 'Created bucketlist successfully','status': 200})
+
+
+
+
+
 
 
 
