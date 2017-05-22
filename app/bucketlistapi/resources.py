@@ -24,8 +24,8 @@ class UserRegister(Resource):
     def post(self):
         data = request.get_json()
         if not data:
-            response = {'error': 'No data provided'}
-            return response, 400
+            response = jsonify({'Error': 'No data provided', 'status': 400})
+            return response
         errors = user_register.validate(data)
         if errors:
             return errors, 400
@@ -35,12 +35,12 @@ class UserRegister(Resource):
         password = data['password']
         verify_password = data['verify_password']
         if password != verify_password:
-            response = {'error': 'Passwords dont match'}
+            response = jsonify({'Error': 'Passwords dont match', 'status': 400})
             return response, 400
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
-            response = {'error': 'Email already in use'}
-            return response, 400
+            response = jsonify({'Error': 'Email already in use','status': 400 })
+            return response
         new_user = User(first_name=first_name,last_name=last_name,email=email, password=password)
         new_user.add(new_user)
         new_user.hash_password(password)
@@ -61,13 +61,15 @@ class UserLogin(Resource):
         password = login_data['password']
         email = User.query.filter_by(email=email).first()
         if not email:
-            response = {'error': 'Email provided does not exist'}
+            response = jsonify({'Error': 'Email provided does not exist','status': 400})
             return response
         if email.verify_password(password):
             token = email.generate_auth_token()
-            return 'Login successful'
+            response = jsonify({'Message': 'Login successful','status': 200})
+            return response
         else:
-            response ={'error': 'Wrong password'}
+            response =jsonify({'Error': 'Wrong password', 'status':400})
+            return response
 
 class Bucketlists(Resource):
     """Create and list bucketlists"""
