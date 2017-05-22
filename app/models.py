@@ -6,7 +6,7 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from app.__init__ import db
-
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
@@ -51,9 +51,12 @@ class User(db.Model, AddUpdateDelete):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password)
 
-    def generate_auth_token(self, expiration = 300):
+    def generate_auth_token(self, expiration = 600):
         s = Serializer(secret, expires_in = expiration)
-        return s.dumps({ 'user_id': self.user_id })
+        s.dumps({ 'id': self.user_id })
+        return s
+
+    @staticmethod
     def verify_auth_token(token):
         s = Serializer(secret)
         try:
@@ -78,6 +81,10 @@ class BucketList(db.Model, AddUpdateDelete):
     items_id = db.Column(db.Integer, db.ForeignKey("bucketlistitem.id"))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
+
+    def __init__(self, name):
+        self.name = name
+
 
 
 class BucketListItems(db.Model, AddUpdateDelete):

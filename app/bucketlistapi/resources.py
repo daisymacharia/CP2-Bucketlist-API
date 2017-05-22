@@ -7,18 +7,32 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from flask_restful import  Resource, abort
-from flask import request,jsonify
+from flask import request,jsonify,g
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from models import User,BucketList,BucketListItems
 from schema import (UserRegistrationSchema,
                                     UserLoginSchema,
                                     BucketListItemSchema,
                                     BucketListSchema)
 
-
+auth = HTTPTokenAuth()
 user_register = UserRegistrationSchema()
 user_login = UserLoginSchema()
 bucket_list = BucketListSchema()
 bucket_list_item = BucketListItemSchema()
+
+@auth.verify_token
+def verify_user_token(token):
+    verified_user = User.verify_auth_token(token)
+    if type(verified_user) is not User:
+        return False
+    else:
+        g.user = verified_user
+        return True
+
+class AuthResource(Resource):
+    method_decorators = [auth.login_required]
+
 class UserRegister(Resource):
     """Register user"""
     def post(self):
@@ -39,7 +53,7 @@ class UserRegister(Resource):
             return response, 400
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
-            response = jsonify({'Error': 'Email already in use','status': 400 })
+            response = jsonify({'Error': 'Email already in use','status': 409 })
             return response
         new_user = User(first_name=first_name,last_name=last_name,email=email, password=password)
         new_user.add(new_user)
@@ -65,13 +79,14 @@ class UserLogin(Resource):
             return response
         if email.verify_password(password):
             token = email.generate_auth_token()
-            response = jsonify({'Message': 'Login successful','status': 200})
+            response = {'Message': 'Login successful','status': 200,
+                                'token': token.decode('ascii')}
             return response
         else:
             response =jsonify({'Error': 'Wrong password', 'status':400})
             return response
 
-class Bucketlists(Resource):
+class Bucketlists(AuthResource):
     """Creates a new bucketlist"""
     def post(self):
         bucketlist_data = request.get_json()
@@ -86,7 +101,9 @@ class Bucketlists(Resource):
         if existing_bucketlist:
             response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 400})
         new_bucketlist_name = BucketList(name=bucketlist_name)
+        new_bucketlist_name.add(new_bucketlist_name)
         response = jsonify({'Message': 'Created bucketlist successfully','status': 200})
+        return response
 
 
 

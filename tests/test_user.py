@@ -1,28 +1,74 @@
-
+import os
 import unittest
-
 from flask import json
-from app import create_app, db
 from instance.config import app_config
-from tests.base_test import BaseTest
 from app.models import User, BucketList, BucketListItems
+from app import create_app
+from instance.config import app_config
+from app.models import User, BucketList, BucketListItems,db
 
-class UserTests(BaseTest):
+class UserTests(unittest.TestCase):
     """Creates class for testing user edge cases"""
     def setUp(self):
         self.app = create_app('testing')
+        self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
-        self.client = self.app.test_client()
+
+        # User registration
+        self.user = {
+            'first_name': 'Felistas',
+            'last_name': 'Ngumi',
+            'email': 'felistaswaceera@gmail.com',
+            'password': '123456',
+            'verify_password': '1234'
+        }
+
+        # User login
+        self.login = {
+            'username': 'felistaswaceera@gmail.com',
+            'password': '123456'
+        }
+
+        # Login with no username
+        self.login_with_no_username = {
+            'username': '',
+            'password': '1234'
+        }
+
+        # Login with no password
+        self.login_with_no_password = {
+            'username': 'felistaswaceera@gmail.com',
+            'password': ''
+        }
+
+        # Login with no username and password
+        self.login_no_credentials = {
+            'username': '',
+            'password': ''
+        }
+
+
+    def tearDown(self):
+        # Delete the test database
+        os.remove('/Users/Shera/Desktop/bucketlist/CP2-BUCKETLIST-APPLICATION/tests/test_bucketlist_db')
+        self.app_context.pop()
+    # def setUp(self):
+    #     self.app = create_app('testing')
+    #     self.app_context = self.app.app_context()
+    #     self.app_context.push()
+    #     db.create_all()
+    #     self.client = self.app.test_client()
     def create_user(self):
         self.user = {
-            "first_name":"felistas",
-             "last_name":"ngumi",
-             "email":"felistaswaceera@gmail.com",
-             "password":"waceera",
-             "verify_password":"waceera"
+            'first_name': 'Felistas',
+            'last_name': 'Ngumi',
+            'email': 'felistaswaceera@gmail.com',
+            'password': '1234',
+            'verify_password': '1234'
         }
+
     def test_create_user_successfully(self):
         """Asserts that a user can be created successfully"""
         response = self.client.post('/api/v1/auth/register',data=json.dumps(self.user))
@@ -40,7 +86,7 @@ class UserTests(BaseTest):
         """Asserts user cannot login with invalid password"""
         data = {
                  "email":"felistaswaceera@gmail.com",
-                 "password":"waceera"
+                 "password":"waceera1"
                 }
         response = self.client.post('api/v1/auth/login', data=data)
         self.assertEquals(response.status_code, 400)
@@ -53,11 +99,7 @@ class UserTests(BaseTest):
         response = self.client.post('api/v1/auth/login', data=data)
         self.assertEquals(response.status_code, 400)
     def test_cannot_register_existing_user(self):
-        """Asserts that an already existing user cannot register again"""
-        self.client.post('/auth/register',data=json.dumps(self.user))
-        register_user = self.client.post('/auth/register',data=json.dumps(self.user))
+        """Asserts cannot register an already existing user"""
+        self.client.post('/api/v1/auth/register',data=json.dumps(self.user))
+        response = self.client.post('/api/v1/auth/register',data=json.dumps(self.user))
         self.assertEquals(response.status_code, 409)
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
