@@ -1,8 +1,5 @@
 from marshmallow import Schema, fields,validate
 
-
-
-
 class UserRegistrationSchema(Schema):
     """Schema class to validate user during registration"""
     first_name = fields.String(validate=(validate.Length(min=1, error='Required')))

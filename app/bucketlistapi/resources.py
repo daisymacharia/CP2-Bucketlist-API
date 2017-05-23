@@ -106,16 +106,16 @@ class Bucketlists(AuthResource):
         return response
 
 
-
-
-
-
-
-
-class BucketlistsId(Resource):
-    """get,update and delete bucketlists"""
-    pass
-
+class BucketlistsId(AuthResource):
+    """List by id,update and delete bucketlists"""
+    def get(self, id):
+        bucket = BucketList.query.get(id)
+        print(bucket)
+        if not bucket:
+            response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
+        # new_bucket = bucket_list.validate(bucket)
+        response = jsonify({'Bucketlist Name:': bucket, 'status': 200})
+        return response
 
 class BucketlistItem(Resource):
     """Create new bucketlist item"""
