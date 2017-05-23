@@ -115,7 +115,9 @@ class Bucketlists(AuthResource):
             return response
         bucketlists = [bucket_list_schema.dump(bucketlist)[0] for bucketlist in all_buckets]
         return bucketlists
-
+    def delete(self):
+        #delete a single bucketlist
+        pass
 
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
@@ -149,11 +151,27 @@ class BucketlistsId(AuthResource):
             bucket.update()
             return 'Successfully updated'
 
-
-class BucketlistItem(Resource):
+class BucketlistItem(AuthResource):
     """Create new bucketlist item"""
-    pass
-
+    def get(self):
+        print("I'm get")
+    def post(self, id):
+        #create a new bucketlist item
+        bucketlist_item = request.get_json()
+        if not bucketlist_item:
+            response = jsonify({'Error': 'No data provided'})
+            return response
+        item_name = bucketlist_item['name']
+        bucketlist = BucketListItems.query.filter_by(bucketlist_id=id).all()
+        if bucketlist:
+            for item in bucketlist:
+                print(item)
+                if item.name == item_name:
+                    return 'Item already exists'
+        #add item
+        item=BucketListItems(name=item_name, bucketlist_id=id)
+        item.add(item)
+        return 'Successfully added item'
 
 class BucketlistItems(Resource):
     """Update and delete bucketlist items"""

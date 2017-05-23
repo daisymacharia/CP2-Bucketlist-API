@@ -78,7 +78,6 @@ class BucketList(db.Model, AddUpdateDelete):
     name = db.Column(db.String(50), nullable=False)
     items = db.relationship("BucketListItems", backref="bucketlist",
                             cascade='all,delete', lazy='joined')
-    items_id = db.Column(db.Integer, db.ForeignKey("bucketlistitem.id"))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
 
@@ -94,4 +93,10 @@ class BucketListItems(db.Model, AddUpdateDelete):
     name = db.Column(db.String(50), nullable=False)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey("bucketlist.id"))
+
     done = db.Column(db.Boolean, default=False)
+
+    def __init__(self, name, bucketlist_id):
+        self.name = name
+        self.bucketlist_id = bucketlist_id
