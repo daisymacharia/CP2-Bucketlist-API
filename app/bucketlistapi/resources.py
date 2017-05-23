@@ -98,8 +98,10 @@ class Bucketlists(AuthResource):
             return validation_errors, 400
         bucketlist_name = bucketlist_data['name']
         existing_bucketlist = BucketList.query.filter_by(name=bucketlist_name).first()
+        print(existing_bucketlist)
         if existing_bucketlist:
             response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 400})
+            return response
         new_bucketlist_name = BucketList(name=bucketlist_name, created_by=g.user.user_id)
         new_bucketlist_name.add(new_bucketlist_name)
         response = jsonify({'Message': 'Created bucketlist successfully','status': 200})
@@ -112,19 +114,21 @@ class BucketlistsId(AuthResource):
         bucket = BucketList.query.filter_by(id=id).first()
         print(bucket)
         if not bucket:
-            response = {'Error': 'The bucketlist requested does not exist','status': 400}
+            response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
             return response
         return bucket_list_schema.dump(bucket)
     def delete(self, id):
         bucket = BucketList.query.filter_by(id=id).first()
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
+            return response
         bucket.delete(bucket)
         return 'Successfully deleted'
     def put(self, id):
         bucket = BucketList.query.filter_by(id=id).first()
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
+            return response
         bucketlist_update = request.get_json()
         validation_errors = bucket_list_schema.validate(bucketlist_update)
         if validation_errors:

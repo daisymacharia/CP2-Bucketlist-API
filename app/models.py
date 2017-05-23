@@ -23,6 +23,7 @@ class AddUpdateDelete():
     def delete(self, resource):
         """To delete attributes passed"""
         db.session.delete(resource)
+        return db.session.commit()
 
 class User(db.Model, AddUpdateDelete):
     """Defines the user model"""
@@ -84,8 +85,6 @@ class BucketList(db.Model, AddUpdateDelete):
     def __init__(self, name, created_by):
         self.name = name
         self.created_by = created_by
-
-
 
 class BucketListItems(db.Model, AddUpdateDelete):
     """Defines the bucketlist item model"""
