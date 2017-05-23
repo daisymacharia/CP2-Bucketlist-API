@@ -181,5 +181,5 @@ class BucketlistItems(Resource):
             if items:
                 return bucket_list_item_schema.dump(items)
             else:
-                response = jsonify({'Error': 'No bucketlist items created','status': 400})
+                response = jsonify({'Error': 'Check your URL snd try again','status': 400})
                 return response
