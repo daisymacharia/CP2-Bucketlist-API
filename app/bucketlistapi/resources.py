@@ -106,11 +106,19 @@ class Bucketlists(AuthResource):
         new_bucketlist_name.add(new_bucketlist_name)
         response = jsonify({'Message': 'Created bucketlist successfully','status': 200})
         return response
-
+    def get(self):
+        #list all bucketlists
+        user = g.user
+        print(type((g.user.user_id)))
+        all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
+        print(bucket_list_schema.dump(all_buckets[0]))
+        bucketlists = [bucket_list_schema.dump(bucketlist)[0] for bucketlist in all_buckets]
+        return bucketlists
 
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
     def get(self, id):
+        #get a specific bucketlist
         bucket = BucketList.query.filter_by(id=id).first()
         print(bucket)
         if not bucket:
@@ -118,6 +126,7 @@ class BucketlistsId(AuthResource):
             return response
         return bucket_list_schema.dump(bucket)
     def delete(self, id):
+        #delete a specific bucketlist
         bucket = BucketList.query.filter_by(id=id).first()
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
@@ -125,6 +134,7 @@ class BucketlistsId(AuthResource):
         bucket.delete(bucket)
         return 'Successfully deleted'
     def put(self, id):
+        #update a specific bucketlist
         bucket = BucketList.query.filter_by(id=id).first()
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
@@ -133,8 +143,9 @@ class BucketlistsId(AuthResource):
         validation_errors = bucket_list_schema.validate(bucketlist_update)
         if validation_errors:
             return validation_errors, 400
-        bucket.update(bucket)
-        return 'Successfully updated'
+        if bucketlist_update['name']:
+            bucket.update()
+            return 'Successfully updated'
 
 
 class BucketlistItem(Resource):
