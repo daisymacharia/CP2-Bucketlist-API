@@ -16,10 +16,10 @@ from schema import (UserRegistrationSchema,
                                     BucketListSchema)
 
 auth = HTTPTokenAuth()
-user_register = UserRegistrationSchema()
-user_login = UserLoginSchema()
-bucket_list = BucketListSchema()
-bucket_list_item = BucketListItemSchema()
+user_register_schema = UserRegistrationSchema()
+user_login_schema = UserLoginSchema()
+bucket_list_schema = BucketListSchema()
+bucket_list_item_schema = BucketListItemSchema()
 
 @auth.verify_token
 def verify_user_token(token):
@@ -40,7 +40,7 @@ class UserRegister(Resource):
         if not data:
             response = jsonify({'Error': 'No data provided', 'status': 400})
             return response
-        errors = user_register.validate(data)
+        errors = user_register_schema.validate(data)
         if errors:
             return errors, 400
         first_name = data['first_name']
@@ -68,7 +68,7 @@ class UserLogin(Resource):
         login_data = request.get_json()
         if not login_data:
             return 'No data provided'
-        errors = user_login.validate(login_data)
+        errors = user_login_schema.validate(login_data)
         if errors:
             return errors, 400
         email = login_data['email']
@@ -93,7 +93,7 @@ class Bucketlists(AuthResource):
         if not bucketlist_data:
             response = jsonify({'Error': 'No data provided'})
             return response
-        validation_errors = bucket_list.validate(bucketlist_data)
+        validation_errors = bucket_list_schema.validate(bucketlist_data)
         if validation_errors:
             return validation_errors, 400
         bucketlist_name = bucketlist_data['name']
@@ -109,19 +109,28 @@ class Bucketlists(AuthResource):
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
     def get(self, id):
-        # bucket = BucketList.query.get(id)
         bucket = BucketList.query.filter_by(id=id).first()
         print(bucket)
         if not bucket:
-            response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
-        response = jsonify({'Bucketlist Name:': bucket, 'status': 200})
-        return response
+            response = {'Error': 'The bucketlist requested does not exist','status': 400}
+            return response
+        return bucket_list.dump(bucket)
     def delete(self, id):
         bucket = BucketList.query.filter_by(id=id).first()
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
         bucket.delete(bucket)
         return 'Successfully deleted'
+    def put(self, id):
+        bucket = BucketList.query.filter_by(id=id).first()
+        if not bucket:
+            response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
+        bucketlist_update = request.get_json()
+        validation_errors = bucket_list.validate(bucketlist_update)
+        if validation_errors:
+            return validation_errors, 400
+        bucket.update(bucket)
+        return 'Successfully updated'
 
 
 class BucketlistItem(Resource):
