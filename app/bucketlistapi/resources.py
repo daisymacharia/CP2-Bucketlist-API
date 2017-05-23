@@ -109,12 +109,20 @@ class Bucketlists(AuthResource):
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
     def get(self, id):
-        bucket = BucketList.query.get(id)
+        # bucket = BucketList.query.get(id)
+        bucket = BucketList.query.filter_by(id=id).first()
         print(bucket)
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
         response = jsonify({'Bucketlist Name:': bucket, 'status': 200})
         return response
+    def delete(self, id):
+        bucket = BucketList.query.filter_by(id=id).first()
+        if not bucket:
+            response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
+        bucket.delete(bucket)
+        return 'Successfully deleted'
+
 
 class BucketlistItem(Resource):
     """Create new bucketlist item"""
