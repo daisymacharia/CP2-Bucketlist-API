@@ -171,15 +171,34 @@ class BucketlistItem(AuthResource):
         item.add(item)
         return 'Successfully added item'
 
-class BucketlistItems(Resource):
+class BucketlistItems(AuthResource):
     """Update and delete bucketlist items"""
     def get(self, id, item_id):
-        #get items for a particular bucketlist
+        #get a specific item for a particular bucketlist
         if BucketListItems.query.filter_by(bucketlist_id=id) and BucketListItems.query.filter_by(id=item_id):
             items = BucketListItems.query.get(item_id)
             print(items)
             if items:
                 return bucket_list_item_schema.dump(items)
             else:
-                response = jsonify({'Error': 'Check your URL snd try again','status': 400})
+                response = jsonify({'Error': 'Check your URL and try again','status': 400})
                 return response
+    def put(self, id, item_id):
+        #update a particular item for a specific bucketlist
+        user = g.user.user_id
+        bucketlist_creator = BucketList.query.filter_by(created_by=user)
+        print(bucketlist_creator)
+        if bucketlist_creator:
+            item = BucketListItems.query.filter_by(bucketlist_id=id).filter_by(id=item_id).first()
+            if item:
+                item_data = request.get_json()
+                errors = bucket_list_schema.validate(item_data)
+                if errors:
+                    return 'Check your fields and try again'
+                done = item_data['done']
+                if done:
+                    item.done = done
+                new_name = item_data['name']
+                item.name = new_name
+                item.update()
+                return 'Successfully updated'
