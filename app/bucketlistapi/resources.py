@@ -83,7 +83,7 @@ class UserLogin(Resource):
                                 'token': token}
             return response
         else:
-            response =jsonify({'Error': 'Wrong password', 'status':400})
+            response =jsonify({'Error': 'Wrong password or email provided', 'status':400})
             return response
 
 class Bucketlists(AuthResource):
@@ -97,10 +97,10 @@ class Bucketlists(AuthResource):
         if validation_errors:
             return validation_errors, 400
         bucketlist_name = bucketlist_data['name']
-        existing_bucketlist = BucketList.query.filter_by(name=bucketlist_name).first()
+        existing_bucketlist = BucketList.query.filter_by(name=bucketlist_name,created_by=g.user.user_id).first()
         print(existing_bucketlist)
         if existing_bucketlist:
-            response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 400})
+            response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 409})
             return response
         new_bucketlist_name = BucketList(name=bucketlist_name, created_by=g.user.user_id)
         new_bucketlist_name.add(new_bucketlist_name)
@@ -152,9 +152,7 @@ class BucketlistsId(AuthResource):
             return 'Successfully updated'
 
 class BucketlistItem(AuthResource):
-    """Create new bucketlist item"""
-    def get(self):
-        print("I'm get")
+    """Create and list new bucketlist item"""
     def post(self, id):
         #create a new bucketlist item
         bucketlist_item = request.get_json()
@@ -175,4 +173,13 @@ class BucketlistItem(AuthResource):
 
 class BucketlistItems(Resource):
     """Update and delete bucketlist items"""
-    pass
+    def get(self, id, item_id):
+        #get items for a particular bucketlist
+        if BucketListItems.query.filter_by(bucketlist_id=id) and BucketListItems.query.filter_by(id=item_id):
+            items = BucketListItems.query.get(item_id)
+            print(items)
+            if items:
+                return bucket_list_item_schema.dump(items)
+            else:
+                response = jsonify({'Error': 'No bucketlist items created','status': 400})
+                return response
