@@ -51,7 +51,7 @@ class User(db.Model, AddUpdateDelete):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password)
 
-    def generate_auth_token(self, expiration = 600):
+    def generate_auth_token(self, expiration = 3600):
         s = Serializer(secret, expires_in = expiration)
         return s.dumps({ 'id': self.user_id })
 
@@ -76,13 +76,14 @@ class BucketList(db.Model, AddUpdateDelete):
     created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     name = db.Column(db.String(50), nullable=False)
     items = db.relationship("BucketListItems", backref="bucketlist",
-                            cascade='all', lazy='joined')
+                            cascade='all,delete', lazy='joined')
     items_id = db.Column(db.Integer, db.ForeignKey("bucketlistitem.id"))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
 
-    def __init__(self, name):
+    def __init__(self, name, created_by):
         self.name = name
+        self.created_by = created_by
 
 
 
