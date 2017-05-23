@@ -109,11 +109,13 @@ class Bucketlists(AuthResource):
     def get(self):
         #list all bucketlists
         user = g.user
-        print(type((g.user.user_id)))
         all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
-        print(bucket_list_schema.dump(all_buckets[0]))
+        if not all_buckets:
+            response = jsonify({'Error': 'No bucketlists currently','status': 400})
+            return response
         bucketlists = [bucket_list_schema.dump(bucketlist)[0] for bucketlist in all_buckets]
         return bucketlists
+
 
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
