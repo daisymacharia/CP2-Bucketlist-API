@@ -12,6 +12,8 @@ class Config(object):
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
+    PAGINATION_PAGE_SIZE = 10
+    PAGINATION_PAGE_ARGUMENT_NAME = 'page'
 
 class TestingConfig(Config):
     """Configurations for Testing, with a separate test database."""

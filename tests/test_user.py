@@ -4,10 +4,11 @@ from flask import json
 from instance.config import app_config
 from app.models import User, BucketList, BucketListItems
 from app import create_app
+from tests.base_test import BaseTest
 from instance.config import app_config
 from app.models import User, BucketList, BucketListItems,db
 
-class UserTests(unittest.TestCase):
+class UserTests(BaseTest):
     """Creates class for testing user edge cases"""
     def setUp(self):
         self.app = create_app('testing')
@@ -16,62 +17,41 @@ class UserTests(unittest.TestCase):
         self.app_context.push()
         db.create_all()
 
-        # User registration
-        self.user = {
-            'first_name': 'Felistas',
-            'last_name': 'Ngumi',
-            'email': 'felistaswaceera@gmail.com',
-            'password': '123456',
-            'verify_password': '1234'
-        }
-
-        # User login
-        self.login = {
-            'username': 'felistaswaceera@gmail.com',
-            'password': '123456'
-        }
-
-        # Login with no username
-        self.login_with_no_username = {
-            'username': '',
-            'password': '1234'
-        }
-
-        # Login with no password
-        self.login_with_no_password = {
-            'username': 'felistaswaceera@gmail.com',
-            'password': ''
-        }
-
-        # Login with no username and password
-        self.login_no_credentials = {
-            'username': '',
-            'password': ''
-        }
-
-
     def tearDown(self):
-        # Delete the test database
-        os.remove('/Users/Shera/Desktop/bucketlist/CP2-BUCKETLIST-APPLICATION/tests/test_bucketlist_db')
-        self.app_context.pop()
-    # def setUp(self):
-    #     self.app = create_app('testing')
-    #     self.app_context = self.app.app_context()
-    #     self.app_context.push()
-    #     db.create_all()
-    #     self.client = self.app.test_client()
-    def create_user(self):
-        self.user = {
+        db.session.remove()
+        db.drop_all()
+    #
+    # def create_user(self):
+    #     self.user = {
+    #         'first_name': 'Felistas',
+    #         'last_name': 'Ngumi',
+    #         'email': 'felistaswaceera@gmail.com',
+    #         'password': '1234',
+    #         'verify_password': '1234'
+    #     }
+    def get_accept_content_type_headers(self):
+        return {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json' }
+    def get_authentication_headers(self, username, password):
+        authentication_headers = self.get_accept_content_type_headers()
+        authentication_headers['Authorization'] = 'Basic ' + b64encode((username + ':' + password).encode('utf- 8')).decode('utf-8')
+        return authentication_headers
+    def create_user(self, name, password):
+        # url = url_for('api.userlistresource', _external=True)
+        user = {
             'first_name': 'Felistas',
             'last_name': 'Ngumi',
             'email': 'felistaswaceera@gmail.com',
             'password': '1234',
             'verify_password': '1234'
-        }
+            }
+        response = self.client.post('/api/v1/auth/register', headers=self.get_accept_content_type_headers(), data=json.dumps(user))
+        return response
 
     def test_create_user_successfully(self):
         """Asserts that a user can be created successfully"""
-        response = self.client.post('/api/v1/auth/register',data=json.dumps(self.user))
+        response = self.create_user(self.test_user_name,self.test_user_password)
         self.assertEquals(response.status_code, 200)
     def test_login_successful(self):
         """Asserts a user can login successfully"""

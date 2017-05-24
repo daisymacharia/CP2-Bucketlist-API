@@ -21,8 +21,7 @@ class BucketlistTestCase(unittest.TestCase):
         }
 
         self.new_bucketlist_item = {
-            'item_name': 'Download tutorials',
-            'status': 'False'
+            'name': 'Download tutorials'
         }
     def tearDown(self):
         db.session.remove()
@@ -31,7 +30,7 @@ class BucketlistTestCase(unittest.TestCase):
 
     def test_create_bucketlist_successfully(self):
         """Test API can create a bucketlist succesfully"""
-        response = self.client.post('/bucketlists/',data=json.dumps(self.new_bucketlist))
+        response = self.client.post('/api/v1/bucketlists/',data=json.dumps(self.new_bucketlist))
         self.assertEqual(response.status_code, 201)
 
     def test_list_all_bucketlists(self):

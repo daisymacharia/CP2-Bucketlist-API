@@ -10,10 +10,13 @@ from flask_restful import  Resource, abort
 from flask import request,jsonify,g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from models import User,BucketList,BucketListItems
+from app.pagination import PaginationHelper
 from schema import (UserRegistrationSchema,
                                     UserLoginSchema,
                                     BucketListItemSchema,
                                     BucketListSchema)
+
+
 
 auth = HTTPTokenAuth()
 user_register_schema = UserRegistrationSchema()
@@ -109,12 +112,13 @@ class Bucketlists(AuthResource):
     def get(self):
         #list all bucketlists
         user = g.user
-        all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
-        if not all_buckets:
+        pagination_helper = PaginationHelper(request,query=BucketList.query.filter_by(created_by=g.user.user_id),
+                                             resource_for_url='/api/v1/bucketlists/',
+                                             key_name='results',schema=bucket_list_schema)        results = pagination_helper.paginate_query()
+        if not results:
             response = jsonify({'Error': 'No bucketlists currently','status': 400})
             return response
-        bucketlists = [bucket_list_schema.dump(bucketlist)[0] for bucketlist in all_buckets]
-        return bucketlists
+        return results
     def delete(self,id):
         #delete a single bucketlist
         user = g.user

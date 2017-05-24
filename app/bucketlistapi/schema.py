@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields,validate
+from flask import url_for
 
 class UserRegistrationSchema(Schema):
     """Schema class to validate user during registration"""
@@ -29,3 +30,9 @@ class BucketListSchema(Schema):
     created_by = fields.Integer(attribute='user.user_id', dump_only=True)
     date_created = fields.DateTime(dump_only=True)
     date_modified = fields.DateTime(dump_only=True)
+
+    url = fields.Method('get_url')
+
+    @staticmethod
+    def get_url(obj):
+        return url_for('bucketlist', id=obj.id, _external=True)
