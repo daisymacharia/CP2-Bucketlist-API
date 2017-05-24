@@ -111,14 +111,25 @@ class Bucketlists(AuthResource):
         return response
     def get(self):
         #list all bucketlists
-        user = g.user
+        search_item = request.args.get('q', None, type=str)
         pagination_helper = PaginationHelper(request,query=BucketList.query.filter_by(created_by=g.user.user_id),
                                              resource_for_url='/api/v1/bucketlists/',
                                              key_name='results',schema=bucket_list_schema)        results = pagination_helper.paginate_query()
+        if not search_item:
+            return results
+        result_item = BucketList.query.filter_by(created_by=g.user.user_id).filter(
+            BucketList.name.contains(search_item)).all()
+        print(result_item)
+
+        if not result_item:
+            response = {'error': 'No results found'}, 404
+        return bucket_list_schema.dump(result_item[0])
         if not results:
             response = jsonify({'Error': 'No bucketlists currently','status': 400})
             return response
         return results
+
+
     def delete(self,id):
         #delete a single bucketlist
         user = g.user

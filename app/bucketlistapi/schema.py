@@ -21,6 +21,12 @@ class BucketListItemSchema(Schema):
     date_created = fields.DateTime(dump_only=True)
     date_modified = fields.DateTime(dump_only=True)
     done = fields.Boolean()
+    url = fields.Method('get_url')
+
+    @staticmethod
+    def get_url(obj):
+        return url_for('bucketlistitem', id=obj.bucketlist_id, item_id=obj.id, _external=True)
+
 
 class BucketListSchema(Schema):
     """Schema class to validate bucketlist"""

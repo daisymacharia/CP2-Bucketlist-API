@@ -24,11 +24,11 @@ def create_app(config_name):
                      endpoint='user_login')
     api.add_resource(Bucketlists, '/api/v1/bucketlists/',
                      endpoint='bucketlists')
-    api.add_resource(BucketlistsId, '/api/v1/bucketlists/<id>',
+    api.add_resource(BucketlistsId, '/api/v1/bucketlists/<int:id>',
                      endpoint='bucketlist')
-    api.add_resource(BucketlistItem, '/api/v1/bucketlists/<id>/items',
+    api.add_resource(BucketlistItem, '/api/v1/bucketlists/<int:id>/items',
                      endpoint='bucketlistitems')
     api.add_resource(BucketlistItems,
-                     '/api/v1/bucketlists/<id>/items/<item_id>',
+                     '/api/v1/bucketlists/<int:id>/items/<int:item_id>',
                      endpoint='bucketlistitem')
     return app
