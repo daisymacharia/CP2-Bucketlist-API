@@ -115,9 +115,15 @@ class Bucketlists(AuthResource):
             return response
         bucketlists = [bucket_list_schema.dump(bucketlist)[0] for bucketlist in all_buckets]
         return bucketlists
-    def delete(self):
+    def delete(self,id):
         #delete a single bucketlist
-        pass
+        user = g.user
+        all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
+        if not all_buckets:
+            response = jsonify({'Error': 'Unauthorized access','status': 400})
+            return response
+        single_bucket=BucketList.query.filter_by(id=id)
+        single_bucket.delete(single_bucket)
 
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
@@ -187,18 +193,28 @@ class BucketlistItems(AuthResource):
         #update a particular item for a specific bucketlist
         user = g.user.user_id
         bucketlist_creator = BucketList.query.filter_by(created_by=user)
-        print(bucketlist_creator)
         if bucketlist_creator:
             item = BucketListItems.query.filter_by(bucketlist_id=id).filter_by(id=item_id).first()
             if item:
                 item_data = request.get_json()
+                print(item_data)
                 errors = bucket_list_schema.validate(item_data)
                 if errors:
                     return 'Check your fields and try again'
-                done = item_data['done']
-                if done:
+                done = None
+                if item_data['done']:
+                    done = item_data['done']
+                if done in item_daya.keys():
                     item.done = done
                 new_name = item_data['name']
                 item.name = new_name
                 item.update()
                 return 'Successfully updated'
+    def delete(self, id, item_id):
+        user = g.user.user_id
+        bucketlist_creator = BucketList.query.filter_by(created_by=user)
+        if bucketlist_creator:
+            item = BucketListItems.query.filter_by(bucketlist_id=id).filter_by(id=item_id).first()
+            if item:
+                item.delete(item)
+                return 'Successfully deleted item'
