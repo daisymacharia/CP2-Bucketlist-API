@@ -113,12 +113,12 @@ class Bucketlists(AuthResource):
         #list all bucketlists
         search_item = request.args.get('q', None, type=str)
         pagination_helper = PaginationHelper(request,query=BucketList.query.filter_by(created_by=g.user.user_id),
-                                             resource_for_url='/api/v1/bucketlists/',
+                                             resource_for_url='bucketlists',
                                              key_name='results',schema=bucket_list_schema)        results = pagination_helper.paginate_query()
         if not search_item:
             return results
         result_item = BucketList.query.filter_by(created_by=g.user.user_id).filter(
-            BucketList.name.contains(search_item)).all()
+            BucketList.name.counts(search_item)).all()
         print(result_item)
 
         if not result_item:
@@ -181,7 +181,7 @@ class BucketlistItem(AuthResource):
         #create a new bucketlist item
         bucketlist_item = request.get_json()
         if not bucketlist_item:
-            response = jsonify({'Error': 'No data provided'})
+            response = jsonify({'Error': 'No data provided', 'status': 400})
             return response
         item_name = bucketlist_item['name']
         bucketlist = BucketListItems.query.filter_by(bucketlist_id=id).all()
@@ -219,10 +219,9 @@ class BucketlistItems(AuthResource):
                 errors = bucket_list_schema.validate(item_data)
                 if errors:
                     return 'Check your fields and try again'
-                done = None
-                if item_data['done']:
+                p = item_data['done']
+                if p:
                     done = item_data['done']
-                if done in item_daya.keys():
                     item.done = done
                 new_name = item_data['name']
                 item.name = new_name

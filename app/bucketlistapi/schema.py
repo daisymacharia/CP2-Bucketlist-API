@@ -3,6 +3,10 @@ from flask import url_for
 
 class UserRegistrationSchema(Schema):
     """Schema class to validate user during registration"""
+    ###########
+
+    ######
+
     first_name = fields.String(validate=(validate.Length(min=1, error='Required')))
     last_name = fields.String(validate=(validate.Length(min=1, error='Required')))
     email = fields.Email(validate=(validate.Length(min=20, error='Required')))
