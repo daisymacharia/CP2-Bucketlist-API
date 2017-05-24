@@ -123,6 +123,7 @@ class Bucketlists(AuthResource):
 
         if not result_item:
             response = {'error': 'No results found'}, 404
+            return response
         return bucket_list_schema.dump(result_item[0])
         if not results:
             response = jsonify({'Error': 'No bucketlists currently','status': 400})
