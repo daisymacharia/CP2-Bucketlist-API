@@ -86,7 +86,7 @@ class UserLogin(Resource):
                                 'token': token}
             return response
         else:
-            response =jsonify({'Error': 'Wrong password or email provided', 'status':400})
+            response =jsonify({'Error': 'Wrong password provided', 'status':400})
             return response
 
 class Bucketlists(AuthResource):
@@ -132,6 +132,7 @@ class Bucketlists(AuthResource):
 
     def delete(self,id):
         #delete a single bucketlist
+        """check on this"""
         user = g.user
         all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
         if not all_buckets:
@@ -169,6 +170,7 @@ class BucketlistsId(AuthResource):
         if validation_errors:
             return validation_errors, 400
         if bucketlist_update['name']:
+            bucket.name = bucketlist_update['name']
             bucket.update()
             return 'Successfully updated'
 
