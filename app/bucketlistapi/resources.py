@@ -83,14 +83,14 @@ class UserLogin(Resource):
         password = data['password']
         email = User.query.filter_by(email=email).first()
         if not email:
-            response = jsonify({'Error': 'Email provided does not exist','status': 404})
+            response = jsonify({'Error': 'Email provided does not exist','status': 400})
             return response
         if email.verify_password(password):
             token = email.generate_auth_token()
             response = jsonify({'Message': 'Login successful','status': 200,'token': token})
             return response
         else:
-            response =jsonify({'Error': 'Wrong password provided', 'status':401})
+            response =jsonify({'Error': 'Wrong password provided', 'status':400})
             return response, 401
 class Bucketlists(AuthResource):
     """Creates a new bucketlist"""
@@ -211,12 +211,12 @@ class BucketlistItems(AuthResource):
             if items:
                 return bucket_list_item_schema.dump(items)
             else:
-                response = jsonify({'Error': 'Check your URL and try again','status': 400})
+                response = jsonify({'Error': 'Item not found','status': 404})
                 return response
     def put(self, id, item_id):
         #update a particular item for a specific bucketlist
         user = g.user.user_id
-        bucketlist_creator = BucketList.query.filter_by(created_by=user)
+        bucketlist_creator = BucketList.query.filter_by(created_by=user).filter_by(id=id)
         if bucketlist_creator:
             item = BucketListItems.query.filter_by(bucketlist_id=id).filter_by(id=item_id).first()
             if item:
@@ -224,15 +224,16 @@ class BucketlistItems(AuthResource):
                 print(item_data)
                 errors = bucket_list_schema.validate(item_data)
                 if errors:
-                    return 'Check your fields and try again'
-                p = item_data['done']
-                if p:
+                    return jsonify({'error':'Check your fields and try again', 'status': 400})
+                if 'done' in item_data:
                     done = item_data['done']
                     item.done = done
                 new_name = item_data['name']
                 item.name = new_name
                 item.update()
                 return jsonify({'message':'Successfully updated','status': 200})
+            return jsonify({'error':'Item not found','status': 400})
+        return jsonify({'error':'Unauthorized access','status': 401})
     def delete(self, id, item_id):
         user = g.user.user_id
         bucketlist_creator = BucketList.query.filter_by(created_by=user)

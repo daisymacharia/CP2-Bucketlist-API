@@ -57,6 +57,10 @@ class UserTest(unittest.TestCase):
             'email': 'felistaswaceera@gmail.com',
             'password': '1234'
         }
+        self.login_wrong_email = {
+            "email": "felistas@gmail.com",
+            'password': '1234'
+        }
 
 
     def tearDown(self):
@@ -89,8 +93,8 @@ class UserTest(unittest.TestCase):
     def test_login_with_no_username(self):
         """Asserts user cannot login with no username"""
         self.client.post('/api/v1/auth/register',data=json.dumps(self.user),headers={"Content-Type": "application/json", 'Accept': 'application/json'})
-        response = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_with_no_username),headers = {"Content-Type": "application/json"})
-        self.assertEqual(response.status_code, 400)
+        response = self.client.post('/api/v1/auth/login/', data=json.dumps(self.login_with_no_username),headers = {"Content-Type": "application/json"})
+        self.assertEqual(response.status_code, 404)
 
     def test_login_with_no_password(self):
         """Asserts user cannot login with no password"""
@@ -102,7 +106,7 @@ class UserTest(unittest.TestCase):
         """Asserts that a user cannot be created successfully with wrong passwords"""
         response = self.client.post('/api/v1/auth/register',data=json.dumps(self.wrong_password),headers={"Content-Type": "application/json", 'Accept': 'application/json'})
         self.assertEquals(json.loads(response.get_data(as_text=True))['status'], 400)
-
+    #
     def test_register_with_no_data(self):
         """Asserts that a user cannot register with no data"""
         response = self.client.post('/api/v1/auth/register',data=json.dumps(self.no_data),headers={"Content-Type": "application/json", 'Accept': 'application/json'})
@@ -118,3 +122,8 @@ class UserTest(unittest.TestCase):
         self.client.post('/api/v1/auth/register',data=json.dumps(self.user),headers={"Content-Type": "application/json", 'Accept': 'application/json'})
         response = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_no_credentials),headers = {"Content-Type": "application/json"})
         self.assertEquals(json.loads(response.get_data(as_text=True))['status'], 400)
+    def test_cannot_login_with_invalid_email(self):
+        """Asserts that a user cannot login with invalid email"""
+        self.client.post('/api/v1/auth/register',data=json.dumps(self.user),headers={"Content-Type": "application/json", 'Accept': 'application/json'})
+        response = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_wrong_email),headers = {"Content-Type": "application/json"})
+        self.assertEqual(response.status_code, 400)
