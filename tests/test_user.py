@@ -50,7 +50,7 @@ class UserTest(unittest.TestCase):
             'email': 'felistaswaceera@gmail.com',
             'password': '1234'
         }
-        self.headers = {"Content-Type": "application/json" }
+        
 
     def tearDown(self):
         db.session.remove()

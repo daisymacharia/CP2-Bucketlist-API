@@ -5,7 +5,6 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET = os.getenv('SECRET')
-    # SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/bucketlist_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -18,7 +17,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing, with a separate test database."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../tests/test_bucketlist_db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/test_bucketlist_db'
     DEBUG = True
 
 class StagingConfig(Config):

@@ -7,7 +7,7 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from flask_restful import  Resource, abort
-from flask import request,jsonify,g
+from flask import request,jsonify,g,make_response,json
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from models import User,BucketList,BucketListItems
 from app.pagination import PaginationHelper
@@ -24,6 +24,7 @@ user_login_schema = UserLoginSchema()
 bucket_list_schema = BucketListSchema()
 bucket_list_item_schema = BucketListItemSchema()
 
+#declaring a callback that flask will use to verify token
 @auth.verify_token
 def verify_user_token(token):
     verified_user = User.verify_auth_token(token)
@@ -34,6 +35,7 @@ def verify_user_token(token):
         return True
 
 class AuthResource(Resource):
+    """Helper class to allow authentication of a token"""
     method_decorators = [auth.login_required]
 
 class UserRegister(Resource):
@@ -53,7 +55,7 @@ class UserRegister(Resource):
         verify_password = data['verify_password']
         if password != verify_password:
             response = jsonify({'Error': 'Passwords dont match', 'status': 400})
-            return response, 400
+            return response
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
             response = jsonify({'Error': 'Email already in use','status': 409 })
@@ -62,33 +64,34 @@ class UserRegister(Resource):
         new_user.add(new_user)
         new_user.hash_password(password)
         username = first_name + ' ' + last_name
-        return {'message': '{} added successfully'.format(username)}, 201
+        return make_response(json.dumps({"message": "{} added successfully".format(username)}), 201)
 
 
 class UserLogin(Resource):
     """Login user"""
     def post(self):
-        login_data = request.get_json()
-        if not login_data:
-            return 'No data provided'
-        errors = user_login_schema.validate(login_data)
+        data = request.get_json()
+        print(data)
+        if not data:
+            response = jsonify({'Error': 'No data provided', 'status': 400})
+            return response
+        errors = user_login_schema.validate(data)
         if errors:
             return errors, 400
-        email = login_data['email']
-        password = login_data['password']
+        email = data['email']
+        password = data['password']
         email = User.query.filter_by(email=email).first()
         if not email:
-            response = jsonify({'Error': 'Email provided does not exist','status': 400})
-            return response
+            response = jsonify({'Error': 'Email provided does not exist','status': 404})
+            return response, 404
         if email.verify_password(password):
             token = email.generate_auth_token()
             response = {'Message': 'Login successful','status': 200,
                                 'token': token}
             return response
         else:
-            response =jsonify({'Error': 'Wrong password provided', 'status':400})
-            return response
-
+            response =jsonify({'Error': 'Wrong password provided', 'status':401})
+            return response, 401
 class Bucketlists(AuthResource):
     """Creates a new bucketlist"""
     def post(self):

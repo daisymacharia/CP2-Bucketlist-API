@@ -68,23 +68,6 @@ class User(db.Model, AddUpdateDelete):
         user = User.query.get(data['id'])
         return user
 
-
-class BucketList(db.Model, AddUpdateDelete):
-    """Defines the bucketlist model"""
-    __tablename__ = "bucketlist"
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, autoincrement=True,primary_key=True)
-    created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"))
-    name = db.Column(db.String(50), nullable=False)
-    items = db.relationship("BucketListItems", backref="bucketlist",
-                            cascade='all,delete', lazy='joined')
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
-
-    def __init__(self, name, created_by):
-        self.name = name
-        self.created_by = created_by
-
 class BucketListItems(db.Model, AddUpdateDelete):
     """Defines the bucketlist item model"""
     __tablename__= "bucketlistitem"
@@ -100,3 +83,19 @@ class BucketListItems(db.Model, AddUpdateDelete):
     def __init__(self, name, bucketlist_id):
         self.name = name
         self.bucketlist_id = bucketlist_id
+
+class BucketList(db.Model, AddUpdateDelete):
+    """Defines the bucketlist model"""
+    __tablename__ = "bucketlist"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, autoincrement=True,primary_key=True)
+    created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+    name = db.Column(db.String(50), nullable=False)
+    items = db.relationship(BucketListItems, backref="bucketlist",
+                            cascade='all,delete', lazy='joined')
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
+
+    def __init__(self, name, created_by):
+        self.name = name
+        self.created_by = created_by
