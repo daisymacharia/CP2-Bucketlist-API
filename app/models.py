@@ -92,7 +92,7 @@ class BucketList(db.Model, AddUpdateDelete):
     created_by = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     name = db.Column(db.String(50), nullable=False)
     items = db.relationship(BucketListItems, backref="bucketlist",
-                            cascade='all,delete', lazy='joined')
+                            cascade='all,delete', lazy='dynamic',viewonly=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
 

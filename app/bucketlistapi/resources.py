@@ -42,30 +42,31 @@ class UserRegister(Resource):
     """Register user"""
     def post(self):
         data = request.get_json()
+        print(data)
         if not data:
             response = jsonify({'Error': 'No data provided', 'status': 400})
             return response
         errors = user_register_schema.validate(data)
         if errors:
-            return errors, 400
+            return errors
         first_name = data['first_name']
         last_name = data['last_name']
         email = data['email']
         password = data['password']
         verify_password = data['verify_password']
         if password != verify_password:
-            response = jsonify({'Error': 'Passwords dont match', 'status': 400})
+            response = jsonify({'Error': 'Passwords dont match','status': 400})
             return response
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
-            response = jsonify({'Error': 'Email already in use','status': 409 })
+            response = jsonify({'Error': 'Email already in use',"status": 409})
             return response
         new_user = User(first_name=first_name,last_name=last_name,email=email, password=password)
         new_user.add(new_user)
         new_user.hash_password(password)
         username = first_name + ' ' + last_name
-        return make_response(json.dumps({"message": "{} added successfully".format(username)}), 201)
-
+        response = jsonify({"message": "{} added successfully".format(username),"status":201})
+        return response
 
 class UserLogin(Resource):
     """Login user"""
@@ -83,11 +84,10 @@ class UserLogin(Resource):
         email = User.query.filter_by(email=email).first()
         if not email:
             response = jsonify({'Error': 'Email provided does not exist','status': 404})
-            return response, 404
+            return response
         if email.verify_password(password):
             token = email.generate_auth_token()
-            response = {'Message': 'Login successful','status': 200,
-                                'token': token}
+            response = jsonify({'Message': 'Login successful','status': 200,'token': token})
             return response
         else:
             response =jsonify({'Error': 'Wrong password provided', 'status':401})
@@ -96,6 +96,7 @@ class Bucketlists(AuthResource):
     """Creates a new bucketlist"""
     def post(self):
         bucketlist_data = request.get_json()
+        print(bucketlist_data)
         if not bucketlist_data:
             response = jsonify({'Error': 'No data provided'})
             return response
@@ -104,13 +105,12 @@ class Bucketlists(AuthResource):
             return validation_errors, 400
         bucketlist_name = bucketlist_data['name']
         existing_bucketlist = BucketList.query.filter_by(name=bucketlist_name,created_by=g.user.user_id).first()
-        print(existing_bucketlist)
         if existing_bucketlist:
             response = jsonify({'Error': 'Bucketlist with the same name already exists','status': 409})
             return response
         new_bucketlist_name = BucketList(name=bucketlist_name, created_by=g.user.user_id)
         new_bucketlist_name.add(new_bucketlist_name)
-        response = jsonify({'Message': 'Created bucketlist successfully','status': 200})
+        response = jsonify({'Message': 'Created bucketlist successfully','status': 201})
         return response
     def get(self):
         #list all bucketlists
@@ -121,7 +121,7 @@ class Bucketlists(AuthResource):
         if not search_item:
             return results
         result_item = BucketList.query.filter_by(created_by=g.user.user_id).filter(
-            BucketList.name.counts(search_item)).all()
+            BucketList.name.contains(search_item)).all()
         print(result_item)
 
         if not result_item:
@@ -129,27 +129,27 @@ class Bucketlists(AuthResource):
             return response
         return bucket_list_schema.dump(result_item[0])
         if not results:
-            response = jsonify({'Error': 'No bucketlists currently','status': 400})
+            response = jsonify({'Error': 'No bucketlists currently','status': 404})
             return response
         return results
 
-
-    def delete(self,id):
-        #delete a single bucketlist
-        """check on this"""
-        user = g.user
-        all_buckets = BucketList.query.filter_by(created_by=user.user_id).all()
-        if not all_buckets:
-            response = jsonify({'Error': 'Unauthorized access','status': 400})
-            return response
-        single_bucket=BucketList.query.filter_by(id=id)
-        single_bucket.delete(single_bucket)
+    #
+    # def delete(self,id):
+    #     #delete all bucketlist
+    #     """check on this"""
+    #     user = g.user
+    #     all_buckets = BucketList.query.filter_by(created_by=user.user_id).filter_by(id=id).first()
+    #     if not all_buckets:
+    #         response = jsonify({'Error': 'Unauthorized access','status': 400})
+    #         return response
+    #     single_bucket=BucketList.query.filter_by(id=id)
+    #     single_bucket.delete(single_bucket)
 
 class BucketlistsId(AuthResource):
     """List by id,update and delete bucketlists"""
     def get(self, id):
         #get a specific bucketlist
-        bucket = BucketList.query.filter_by(id=id).first()
+        bucket = BucketList.query.filter_by(id=id).filter_by(created_by=g.user.user_id)
         print(bucket)
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
@@ -157,12 +157,13 @@ class BucketlistsId(AuthResource):
         return bucket_list_schema.dump(bucket)
     def delete(self, id):
         #delete a specific bucketlist
-        bucket = BucketList.query.filter_by(id=id).first()
+        bucket = BucketList.query.filter_by(id=id).filter_by(created_by=g.user.user_id)
         if not bucket:
             response = jsonify({'Error': 'The bucketlist requested does not exist','status': 400})
             return response
-        bucket.delete(bucket)
-        return 'Successfully deleted'
+        bucket.delete()
+        response = jsonify({'message': 'Successfully deleted','status': 200})
+        return response
     def put(self, id):
         #update a specific bucketlist
         bucket = BucketList.query.filter_by(id=id).first()
@@ -192,11 +193,13 @@ class BucketlistItem(AuthResource):
             for item in bucketlist:
                 print(item)
                 if item.name == item_name:
-                    return 'Item already exists'
+                    response = jsonify({'Error':'Item already exists', 'status': 409})
+                    return response
+
         #add item
         item=BucketListItems(name=item_name, bucketlist_id=id)
         item.add(item)
-        return 'Successfully added item'
+        return jsonify({'Message':'Successfully added item', 'status': 201})
 
 class BucketlistItems(AuthResource):
     """Update and delete bucketlist items"""
@@ -229,7 +232,7 @@ class BucketlistItems(AuthResource):
                 new_name = item_data['name']
                 item.name = new_name
                 item.update()
-                return 'Successfully updated'
+                return jsonify({'message':'Successfully updated','status': 200})
     def delete(self, id, item_id):
         user = g.user.user_id
         bucketlist_creator = BucketList.query.filter_by(created_by=user)
@@ -237,4 +240,4 @@ class BucketlistItems(AuthResource):
             item = BucketListItems.query.filter_by(bucketlist_id=id).filter_by(id=item_id).first()
             if item:
                 item.delete(item)
-                return 'Successfully deleted item'
+                return jsonify({'message':'Successfully deleted item','status': 200})
