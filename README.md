@@ -158,12 +158,6 @@ Install on your local machine `Postman`
 Start your server
 `$ python run.py` or `flask run`
 
-# USAGE AND TESTING
-EndPoint    |   Functionality
-:-----------|:---------------
-`http://127.0.0.1:5000/api/v1/auth/register`       | Register a user
-`http://127.0.0.1:5000/api/v1/auth/login`          | Logs a user in
-`http://127.0.0.1:5000/api/v1/bucketlists/`        | Create a bucketlist
 
 
 
