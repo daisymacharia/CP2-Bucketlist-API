@@ -155,5 +155,10 @@ Run your migrations
 	
 	
 ### Register
-![login](https://cloud.githubusercontent.com/assets/17156765/26498575/2c8283ba-4238-11e7-9008-4965ade15ef2.png)
+![register](https://cloud.githubusercontent.com/assets/17156765/26498575/2c8283ba-4238-11e7-9008-4965ade15ef2.png)
+
+### Login
+![login](https://cloud.githubusercontent.com/assets/17156765/26498571/2c599180-4238-11e7-897e-32479a162a09.png)
+
+###
 
