@@ -148,10 +148,11 @@ $ source ~/.bashrc
 ```
 Run your migrations
 
-```
-$ python manage.py db init
-$ python manage.py db migrate
-$ python manage.py db upgrade
-```
+	$ python manage.py db init
+	$ python manage.py db migrate
+	$ python manage.py db upgrade
+	
+	
+### Register
+![login](https://cloud.githubusercontent.com/assets/17156765/26498575/2c8283ba-4238-11e7-9008-4965ade15ef2.png)
 
-![User Register](https://cloud.githubusercontent.com/assets/17156765/26498575/2c8283ba-4238-11e7-9008-4965ade15ef2.png)
