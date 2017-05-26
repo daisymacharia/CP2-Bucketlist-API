@@ -160,5 +160,15 @@ Run your migrations
 ### Login
 ![login](https://cloud.githubusercontent.com/assets/17156765/26498571/2c599180-4238-11e7-897e-32479a162a09.png)
 
-###
+### Create Bucketlist
+![create bucketlist](https://cloud.githubusercontent.com/assets/17156765/26499668/20ca3438-423c-11e7-9872-c1d7b46385ac.png)
+
+### Lists bucketlists
+![list bucketlists](https://cloud.githubusercontent.com/assets/17156765/26499758/654530d6-423c-11e7-934c-d4c7df86bda4.png)
+
+### Get one bucketlist
+![Get one bucktlist](https://cloud.githubusercontent.com/assets/17156765/26499844/a2823552-423c-11e7-8d50-23c482b0e564.png)
+
+
+
 
