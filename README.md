@@ -1,7 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c06252dafb3d4ab7a72a40b5fbf86a36)](https://www.codacy.com/app/Felistas/CP2-Bucketlist-API?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Felistas/CP2-Bucketlist-API&amp;utm_campaign=Badge_Grade)
-
 # CP2-BUCKETLIST-APPLICATION
  API for an online Bucket List service using FlaskRestFul
 According to Merriam-Webster Dictionary, a Bucket List is a list of things that one has not done before but wants to do before dying. The Api contains the following specifications.
