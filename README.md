@@ -157,7 +157,5 @@ Install on your local machine `Postman`
 
 Start your server
 `$ python run.py` or `flask run`
-
-
-
-
+###Register User
+![image](https://cloud.githubusercontent.com/assets/17156765/26497490/68d94bd6-4234-11e7-8ec7-4c0c5bfe9eab.png)
