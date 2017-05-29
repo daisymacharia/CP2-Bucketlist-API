@@ -22,6 +22,7 @@ class AddUpdateDelete():
         return db.session.commit()
     def delete(self, resource):
         """To delete attributes passed"""
+        # db.session.rollback()
         db.session.delete(resource)
         return db.session.commit()
 
@@ -75,8 +76,10 @@ class BucketListItems(db.Model, AddUpdateDelete):
     id = db.Column(db.Integer, autoincrement=True,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
-    bucketlist_id = db.Column(db.Integer, db.ForeignKey("bucketlist.id"))
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey("bucketlist.id"), nullable=
+                              False)
 
     done = db.Column(db.Boolean, default=False)
 
@@ -94,7 +97,8 @@ class BucketList(db.Model, AddUpdateDelete):
     items = db.relationship(BucketListItems, backref="bucketlist",
                             cascade='all,delete', lazy='dynamic',viewonly=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),onupdate=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
 
     def __init__(self, name, created_by):
         self.name = name

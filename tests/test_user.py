@@ -53,12 +53,20 @@ class UserTest(unittest.TestCase):
         # Login with no username and password
         self.login_no_credentials = {
         }
+        self.login_wrong_password = {
+            'email': 'felistaswambugu@gmail.com',
+            'password': '123456'
+        }
         self.invalid_password = {
             'email': 'felistaswaceera@gmail.com',
             'password': '1234'
         }
         self.login_wrong_email = {
             "email": "felistas@gmail.com",
+            'password': '1234'
+        }
+        self.login_no_email = {
+            "email":'',
             'password': '1234'
         }
 
@@ -180,6 +188,17 @@ class UserTest(unittest.TestCase):
             response.get_data(as_text=True))['status'], 400)
     def test_cannot_login_with_invalid_email(self):
         """Asserts that a user cannot login with invalid email"""
+        self.client.post('/api/v1/auth/register',data=json.dumps(self.user),
+                         headers={"Content-Type": "application/json",
+                                  'Accept': 'application/json'})
+        response = self.client.post('/api/v1/auth/login',
+                                    data=json.dumps(self.login_wrong_email),
+                                    headers = {
+                                        "Content-Type": "application/json"})
+        self.assertEqual(response.status_code, 400)
+
+    def test_cannot_login_without_email(self):
+        """Asserts that a user cannot login without an email"""
         self.client.post('/api/v1/auth/register',data=json.dumps(self.user),
                          headers={"Content-Type": "application/json",
                                   'Accept': 'application/json'})

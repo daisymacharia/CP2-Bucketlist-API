@@ -4,10 +4,12 @@ from flask import url_for
 class UserRegistrationSchema(Schema):
     """Schema class to validate user during registration"""
     first_name = fields.String(validate=[validate.Length(min=2),
-                validate.Regexp(r"[a-zA-Z0-9_\- ]*$", error="Invalid characters")],
+                validate.Regexp(r"[a-zA-Z0-9_\- ]*$",
+                                error="Invalid characters")],
                 required=True,error_messages={'required': 'Enter first name'})
     last_name = fields.String(validate=[validate.Length(min=2),
-                validate.Regexp(r"[a-zA-Z0-9_\- ]*$", error="Invalid characters")],
+                validate.Regexp(r"[a-zA-Z0-9_\- ]*$",
+                                error="Invalid characters")],
                 required=True,error_messages={'required': 'Enter last name'})
     email = fields.Email(validate=[validate.Length(max=50)],
                     required=True,error_messages={'required': 'Enter email'})
